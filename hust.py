@@ -2,17 +2,14 @@ from selenium import webdriver
 import csv
 from get_all_submits import *
 
-problem_url = {"新计算器二": "http://10.112.143.110/submitpage.php?cid=1003&pid=0&langmask=262140",
-           "双11优惠": "http://10.112.143.110/submitpage.php?cid=1003&pid=1&langmask=262140",
-           "数字统计二": "http://10.112.143.110/submitpage.php?cid=1003&pid=2&langmask=262140",
-           "打印图形四": "http://10.112.143.110/submitpage.php?cid=1003&pid=3&langmask=262140",
-           "个位数": "http://10.112.143.110/problem.php?cid=1003&pid=4"}
+problem_url = conf.problem_url
 
-exam_login_url = "http://10.112.143.110/contest.php?cid=1007"
-exam_pwd = "123"
+exam_login_url = conf.exam_login_url
+exam_pwd = conf.exam_pwd
+
 
 def hust_login(user, psw):
-    chromedriver_path = "C:\Program Files (x86)\Google\Chrome\Application\chromedriver.exe"
+    chromedriver_path = conf.chromedriver_path
     # 创建浏览器对象
     driver = webdriver.Chrome(chromedriver_path)
     driver.get("http://10.112.143.110/loginpage.php")
@@ -22,28 +19,29 @@ def hust_login(user, psw):
         driver.find_element_by_name("password").send_keys(psw)
         elem_sub = driver.find_element_by_xpath('//*[@id="login"]/div[3]/div[1]/button')
         elem_sub.click()
-        driver.get("http://10.112.143.110/contest.php?cid=1007")
-        driver.find_element_by_name("password").send_keys(exam_pwd)
-        elem_sub2 = driver.find_element_by_xpath('/html/body/div[1]/div/form/input[2]')
-        elem_sub2.click()
+        # driver.get(conf.hustoj_login_address)
+        # driver.find_element_by_name("password").send_keys(exam_pwd)
+        # elem_sub2 = driver.find_element_by_xpath('/html/body/div[1]/div/form/input[2]')
+        # elem_sub2.click()
 
     except:
         print("登陆失败")
     return driver
+
 
 def get_usr_lst(dic):
     file = csv.reader(open('oj_user.csv', 'r', encoding='utf-8'))
     cnt = 0
     for f in file:
         if cnt == 0:
-            cnt = cnt+1
+            cnt = cnt + 1
             continue
 
-        cnt = cnt+1
+        cnt = cnt + 1
         dic[f[1]] = f[2]
-        #print(f[1])
-        #print(dic[f[1]])
-        #print("-----------------------------------------------------")
+        # print(f[1])
+        # print(dic[f[1]])
+        # print("-----------------------------------------------------")
     return dic
 
 
@@ -59,16 +57,22 @@ def process(id, submits_lst):
     # 获取账号密码
     user_dic = {}
     get_usr_lst(user_dic)
-    pwd = user_dic[id]
+    try:
+        pwd = user_dic[id]
+    except:
+        print('该用户不存在' + id)
+        return 0
     driver = hust_login(id, pwd)
     # 提交每一道题
     for submit_dic in submits_lst:
         # 获取题目
-        title = submit_dic['question']
+        title = submit_dic['submit_question']
         # 根据题目获取url
         submit_url = get_url(title)
-
-        driver.get(submit_url)
+        try:
+            driver.get(submit_url)
+        except:
+            continue
         code = submit_dic['submit_code']
         set_text(code)
 
@@ -77,18 +81,13 @@ def process(id, submits_lst):
         # 粘贴
         driver.switch_to.active_element.send_keys(Keys.CONTROL, 'v')
         # 提交
-        elem_sub = driver.find_element_by_xpath('/html/body/div[1]/div/form/input[2]')
-        elem_sub.click('//*[@id="Submit"]')
-
-
-
-
+        driver.find_element_by_xpath('//*[@id="Submit"]').click()
+        print('submit success')
+        driver.quit()
 
 
 def test():
     dic = {}
     get_usr_lst(dic)
-    #def hust_submit():
-    #hust_login("2018110758", "2018110758")
-
-
+    # def hust_submit():
+    # hust_login("2018110758", "2018110758")

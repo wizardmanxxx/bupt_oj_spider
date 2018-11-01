@@ -4,19 +4,20 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 
 import win32clipboard as w
+import conf
 
 import win32con
 
 
 def login():
-    chromedriver_path = "C:\Program Files (x86)\Google\Chrome\Application\chromedriver.exe"
+    chromedriver_path = conf.chromedriver_path
     # 创建浏览器对象
     driver = webdriver.Chrome(chromedriver_path)
-    driver.get("http://10.105.242.83/accounts/login/")
+    driver.get(conf.login_address)
     cookie = driver.get_cookies()
     try:
-        driver.find_element_by_id("id_username").send_keys("scsxuliutong")
-        driver.find_element_by_id("id_password").send_keys("154639")
+        driver.find_element_by_id("id_username").send_keys(conf.id_username)
+        driver.find_element_by_id("id_password").send_keys(conf.id_password)
         elem_sub = driver.find_element_by_xpath('//*[@id="content_body"]/div/div/div[1]/form/button')
         elem_sub.click()
     except:
@@ -25,12 +26,12 @@ def login():
 
 
 def get_submit(driver):
-    driver.get("http://10.105.242.83/contest/430/submission/")
+    driver.get(conf.submit_address)
     pages = driver.find_element_by_xpath('//*[@id="wrapper"]/div/ul/li[1]').text.split(' ')[3]
     stu_submit = {}
     # 遍历所有页
-    for page in range(1, 2):
-        url = 'http://10.105.242.83/contest/430/submission/' + '?page=' + str(page) + '&'
+    for page in range(1, 5):
+        url = conf.submit_address + '?page=' + str(page) + '&'
         driver.get(url)
         entrys = 15
         # 遍历每页中的提交
@@ -63,7 +64,7 @@ def get_submit(driver):
 def add_code(driver, stu_submit):
     for user_id in stu_submit.keys():
         for dic in stu_submit[user_id]:
-            url = 'http://10.105.242.83/contest/430/submission/' + dic['submit_id']
+            url = conf.submit_address + dic['submit_id']
             driver.get(url)
             # textarea =  driver.find_element_by_id('code-text')
             # textarea.get_attribute('innerHTML')

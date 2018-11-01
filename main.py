@@ -1,9 +1,14 @@
 from get_all_submits import *
+import hust
 
 if __name__ == "__main__":
     driver = login()
     stu_submit = get_submit(driver)
-    add_code(driver,stu_submit)
+    add_code(driver, stu_submit)
+    driver.quit()
+    for key in stu_submit.keys():
+        hust.process(key, stu_submit[key])
+
     print('test')
 
 # 获取新的页面快照
@@ -40,4 +45,3 @@ if __name__ == "__main__":
 # driver.close()
 
 # 关闭浏览器
-driver.quit()
