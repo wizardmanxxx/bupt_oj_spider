@@ -1,6 +1,7 @@
 from selenium import webdriver
 import csv
 from get_all_submits import *
+import time
 
 problem_url = conf.problem_url
 
@@ -8,12 +9,22 @@ exam_login_url = conf.exam_login_url
 exam_pwd = conf.exam_pwd
 
 
-def hust_login(user, psw):
-    chromedriver_path = conf.chromedriver_path
+def hust_login(driver, user, psw, cnt):
+    # chromedriver_path = conf.chromedriver_path
     # 创建浏览器对象
-    driver = webdriver.Chrome(chromedriver_path)
-    driver.get("http://10.112.143.110/loginpage.php")
-    cookie = driver.get_cookies()
+    # driver = webdriver.Chrome(chromedriver_path)
+    if cnt == 0:
+        driver.get("http://10.112.143.110/loginpage.php")
+
+    else:
+        print(user)
+        driver.find_element_by_xpath('//*[@id="profile"]').click()
+        try:
+            driver.find_element_by_xpath('//*[@id="navbar"]/ul[2]/li/ul/li[5]/a').click()
+        except:
+            pass
+        driver.get("http://10.112.143.110/loginpage.php")
+
     try:
         driver.find_element_by_name("user_id").send_keys(user)
         driver.find_element_by_name("password").send_keys(psw)
@@ -25,7 +36,7 @@ def hust_login(user, psw):
         # elem_sub2.click()
 
     except:
-        print("登陆失败")
+        print("学号:" + user + "登陆失败")
     return driver
 
 
@@ -53,7 +64,7 @@ def get_url(title):
     return "ERROR"
 
 
-def process(id, submits_lst):
+def process(driver, id, submits_lst, count):
     # 获取账号密码
     user_dic = {}
     get_usr_lst(user_dic)
@@ -62,9 +73,9 @@ def process(id, submits_lst):
     except:
         print('该用户不存在' + id)
         return 0
-    driver = hust_login(id, pwd)
+    driver = hust_login(driver, id, pwd, count)
     # 提交每一道题
-    for submit_dic in submits_lst:
+    for index ,submit_dic in enumerate(submits_lst):
         # 获取题目
         title = submit_dic['submit_question']
         # 根据题目获取url
@@ -72,6 +83,9 @@ def process(id, submits_lst):
         try:
             driver.get(submit_url)
         except:
+            alert = driver.switch_to_alert()
+            time.sleep(2)
+            alert.accept()
             continue
         code = submit_dic['submit_code']
         set_text(code)
@@ -82,8 +96,9 @@ def process(id, submits_lst):
         driver.switch_to.active_element.send_keys(Keys.CONTROL, 'v')
         # 提交
         driver.find_element_by_xpath('//*[@id="Submit"]').click()
-        print('submit success')
-        driver.quit()
+        if index != len(submits_lst)-1:
+            time.sleep(10)
+
 
 
 def test():

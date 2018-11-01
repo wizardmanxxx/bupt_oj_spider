@@ -2,14 +2,16 @@ from get_all_submits import *
 import hust
 
 if __name__ == "__main__":
+    count = 0
     driver = login()
     stu_submit = get_submit(driver)
     add_code(driver, stu_submit)
-    driver.quit()
-    for key in stu_submit.keys():
-        hust.process(key, stu_submit[key])
 
-    print('test')
+    for key in stu_submit.keys():
+        hust.process(driver, key, stu_submit[key], count)
+        count = 1
+
+    driver.close()
 
 # 获取新的页面快照
 # driver.save_screenshot("denglu.png")

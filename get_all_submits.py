@@ -30,7 +30,7 @@ def get_submit(driver):
     pages = driver.find_element_by_xpath('//*[@id="wrapper"]/div/ul/li[1]').text.split(' ')[3]
     stu_submit = {}
     # 遍历所有页
-    for page in range(1, 5):
+    for page in range(1, 2):
         url = conf.submit_address + '?page=' + str(page) + '&'
         driver.get(url)
         entrys = 15
