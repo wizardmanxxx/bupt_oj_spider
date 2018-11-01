@@ -1,0 +1,93 @@
+from selenium import webdriver
+from selenium.webdriver.common.action_chains import ActionChains
+# 要想调用键盘按键操作需要引入keys包
+from selenium.webdriver.common.keys import Keys
+
+import win32clipboard as w
+
+import win32con
+
+
+def login():
+    chromedriver_path = "C:\Program Files (x86)\Google\Chrome\Application\chromedriver.exe"
+    # 创建浏览器对象
+    driver = webdriver.Chrome(chromedriver_path)
+    driver.get("http://10.105.242.83/accounts/login/")
+    cookie = driver.get_cookies()
+    try:
+        driver.find_element_by_id("id_username").send_keys("scsxuliutong")
+        driver.find_element_by_id("id_password").send_keys("154639")
+        elem_sub = driver.find_element_by_xpath('//*[@id="content_body"]/div/div/div[1]/form/button')
+        elem_sub.click()
+    except:
+        print("登陆失败")
+    return driver
+
+
+def get_submit(driver):
+    driver.get("http://10.105.242.83/contest/430/submission/")
+    pages = driver.find_element_by_xpath('//*[@id="wrapper"]/div/ul/li[1]').text.split(' ')[3]
+    stu_submit = {}
+    # 遍历所有页
+    for page in range(1, 2):
+        url = 'http://10.105.242.83/contest/430/submission/' + '?page=' + str(page) + '&'
+        driver.get(url)
+        entrys = 15
+        # 遍历每页中的提交
+        for entry in range(1, entrys):
+            dic = {}
+            try:
+                sub_id = driver.find_element_by_xpath(
+                    '// *[ @ id = "wrapper"] / div / table / tbody / tr[' + str(entry) + '] / td[1]').text
+                dic['submit_id'] = sub_id
+                sub_question = driver.find_element_by_xpath(
+                    '//*[@id="wrapper"]/div/table/tbody/tr[' + str(entry) + ']/td[2]').text
+                dic['submit_question'] = sub_question
+                sub_result = driver.find_element_by_xpath(
+                    '//*[@id="wrapper"]/div/table/tbody/tr[' + str(entry) + ']/td[3]').text
+                dic['submit_result'] = sub_result
+                sub_user = driver.find_element_by_xpath(
+                    '//*[@id="wrapper"]/div/table/tbody/tr[' + str(entry) + ']/td[7]').text
+            except:
+                print('获取完毕')
+                return stu_submit
+
+            if sub_user not in stu_submit:
+                tmp = [dic]
+                stu_submit[sub_user] = tmp
+            else:
+                stu_submit[sub_user].append(dic)
+    return stu_submit
+
+
+def add_code(driver, stu_submit):
+    for user_id in stu_submit.keys():
+        for dic in stu_submit[user_id]:
+            url = 'http://10.105.242.83/contest/430/submission/' + dic['submit_id']
+            driver.get(url)
+            # textarea =  driver.find_element_by_id('code-text')
+            # textarea.get_attribute('innerHTML')
+            # code = driver.execute_script("return arguments[0].innerHTML", textarea)
+            # 鼠标模拟点击
+            text = driver.find_element_by_xpath(
+                '//*[@id="wrapper"]/div[2]/div/div/div[2]/div/div[6]/div[1]/div/div/div/div[5]/div[1]/pre/span/span')
+            ActionChains(driver).click(text).perform()
+
+            driver.switch_to.active_element.send_keys(Keys.CONTROL, 'a')
+            driver.switch_to.active_element.send_keys(Keys.CONTROL, 'c')
+            code = get_text()
+            dic['submit_code'] = code
+
+
+def get_text():  # 读取剪切板
+    w.OpenClipboard()
+    d = w.GetClipboardData(win32con.CF_TEXT)
+    w.CloseClipboard()
+    return d
+
+
+def set_text(aString):  # 写入剪切板
+    w.OpenClipboard()
+    w.EmptyClipboard()
+    w.SetClipboardData(win32con.CF_TEXT, aString)
+    w.CloseClipboard()
