@@ -1,9 +1,11 @@
 from selenium import webdriver
-import time
-import re
+from selenium.webdriver.common.action_chains import ActionChains
 # 要想调用键盘按键操作需要引入keys包
 from selenium.webdriver.common.keys import Keys
 
+import win32clipboard as w
+
+import win32con
 
 def login():
     chromedriver_path = "C:\Program Files (x86)\Google\Chrome\Application\chromedriver.exe"
@@ -62,11 +64,33 @@ def add_code():
         for dic in stu_submit[user_id]:
             url = 'http://10.105.242.83/contest/430/submission/' + dic['submit_id']
             driver.get(url)
-            textarea =  driver.find_element_by_id('code-text')
-            textarea.get_attribute('innerHTML')
-            code = driver.execute_script("return arguments[0].innerHTML", textarea)
+            # textarea =  driver.find_element_by_id('code-text')
+            # textarea.get_attribute('innerHTML')
+            # code = driver.execute_script("return arguments[0].innerHTML", textarea)
+            # 鼠标模拟点击
+            text = driver.find_element_by_xpath(
+                '//*[@id="wrapper"]/div[2]/div/div/div[2]/div/div[6]/div[1]/div/div/div/div[5]/div[1]/pre/span/span')
+            ActionChains(driver).click(text).perform()
 
-            print(code)
+            driver.switch_to.active_element.send_keys(Keys.CONTROL, 'a')
+            driver.switch_to.active_element.send_keys(Keys.CONTROL, 'c')
+            code = get_text()
+            dic['submit_code']=code
+
+
+
+def get_text():  # 读取剪切板
+    w.OpenClipboard()
+    d = w.GetClipboardData(win32con.CF_TEXT)
+    w.CloseClipboard()
+    return d
+
+
+def set_text(aString):  # 写入剪切板
+    w.OpenClipboard()
+    w.EmptyClipboard()
+    w.SetClipboardData(win32con.CF_TEXT, aString)
+    w.CloseClipboard()
 
 
 if __name__ == "__main__":
@@ -76,7 +100,7 @@ if __name__ == "__main__":
     print('test')
 
 # 获取新的页面快照
-driver.save_screenshot("denglu.png")
+# driver.save_screenshot("denglu.png")
 
 # 打印网页渲染后的源代码
 # print(driver.page_source)
