@@ -1,4 +1,4 @@
-    from selenium import webdriver
+from selenium import webdriver
 import time
 import re
 # 要想调用键盘按键操作需要引入keys包
