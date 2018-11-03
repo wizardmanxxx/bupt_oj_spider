@@ -25,12 +25,12 @@ def login():
     return driver
 
 
-def get_submit(driver):
+def get_submit(driver, is_all_stu):
     driver.get(conf.submit_address)
     pages = driver.find_element_by_xpath('//*[@id="wrapper"]/div/ul/li[1]').text.split(' ')[3]
     stu_submit = {}
     # 遍历所有页
-    for page in range(50, 55):
+    for page in range(1, int(pages)):
         url = conf.submit_address + '?page=' + str(page) + '&'
         driver.get(url)
         entrys = 15
@@ -53,6 +53,8 @@ def get_submit(driver):
                 print('获取完毕')
                 return stu_submit
 
+            if not is_all_stu and sub_user not in conf.needed_stu:
+                continue
             if sub_user not in stu_submit:
                 tmp = [dic]
                 stu_submit[sub_user] = tmp

@@ -34,6 +34,7 @@ def hust_login(driver, user, psw, cnt):
     alert = is_alert_present(driver)
     if alert:
         alert.accept()
+        print('user :'+user+'密码错误')
         return None
     driver.get('http://10.112.143.110')
     # driver.get(conf.hustoj_login_address)

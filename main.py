@@ -4,7 +4,7 @@ import hust
 if __name__ == "__main__":
     count = 0
     driver = login()
-    stu_submit = get_submit(driver)
+    stu_submit = get_submit(driver, False)
     add_code(driver, stu_submit)
 
     for key in stu_submit.keys():
