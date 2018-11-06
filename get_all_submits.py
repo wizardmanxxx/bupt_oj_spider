@@ -25,7 +25,7 @@ def login():
     return driver
 
 
-def get_submit(driver, is_all_stu):
+def get_submit(driver, is_all_stu=True):
     driver.get(conf.submit_address)
     pages = driver.find_element_by_xpath('//*[@id="wrapper"]/div/ul/li[1]').text.split(' ')[3]
     stu_submit = {}
