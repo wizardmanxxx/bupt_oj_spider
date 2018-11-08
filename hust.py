@@ -34,7 +34,7 @@ def hust_login(driver, user, psw, cnt):
     alert = is_alert_present(driver)
     if alert:
         alert.accept()
-        print('user :'+user+'密码错误')
+        print('user :' + user + '密码错误')
         return None
     driver.get('http://10.112.143.110')
     # driver.get(conf.hustoj_login_address)
@@ -106,8 +106,10 @@ def process(driver, id, submits_lst, count):
             driver.get(submit_url)
         except:
             continue
-        code = submit_dic['submit_code']
-        set_text(code)
+        code_raw = submit_dic['submit_code']
+        code = str(code_raw, encoding='gbk').replace('system("pause");', '')
+        code_b = bytes(code, encoding='gbk')
+        set_text(code_b)
 
         text = driver.find_element_by_xpath('//*[@id="source"]/div[2]/div')
         ActionChains(driver).click(text).perform()

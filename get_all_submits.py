@@ -33,7 +33,7 @@ def get_submit(driver, is_all_stu=True):
     for page in range(1, int(pages)):
         url = conf.submit_address + '?page=' + str(page) + '&'
         driver.get(url)
-        entrys = 15
+        entrys = 16
         # 遍历每页中的提交
         for entry in range(1, entrys):
             dic = {}
