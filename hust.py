@@ -98,6 +98,8 @@ def process(driver, id, submits_lst, count):
         return 0
     # 提交每一道题
     for index, submit_dic in enumerate(submits_lst):
+        if submit_dic is None:
+            continue
         # 获取题目
         title = submit_dic['submit_question']
         # 根据题目获取url

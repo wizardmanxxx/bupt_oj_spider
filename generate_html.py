@@ -9,8 +9,8 @@ def html_generator(dic):
         list = dic[key]
         length = len(list)
         line_name = '<tr><td colspan="3" align="center">' + key + '</td></tr>'
-        list2 = find_latest_submit(list)
-        for index, sub in enumerate(list2):
+        # list2 = find_latest_submit(list)
+        for index, sub in enumerate(list):
             if sub is None:
                 continue
             str1 = str(sub['submit_code'], encoding='gbk').replace('\r\n', '\n')

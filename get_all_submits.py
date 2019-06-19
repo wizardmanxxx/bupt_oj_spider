@@ -2,7 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 # 要想调用键盘按键操作需要引入keys包
 from selenium.webdriver.common.keys import Keys
-
+import generate_html
 import win32clipboard as w
 import conf
 
@@ -30,7 +30,7 @@ def get_submit(driver, is_all_stu=True):
     pages = driver.find_element_by_xpath('//*[@id="wrapper"]/div/ul/li[1]').text.split(' ')[3]
     stu_submit = {}
     # 遍历所有页
-    for page in range(1, int(pages)):
+    for page in range(1, 73):
         url = conf.submit_address + '?page=' + str(page) + '&'
         driver.get(url)
         entrys = 16
@@ -66,6 +66,8 @@ def get_submit(driver, is_all_stu=True):
 def add_code(driver, stu_submit):
     for user_id in stu_submit.keys():
         for dic in stu_submit[user_id]:
+            if dic is None:
+                continue
             url = conf.submit_address + dic['submit_id']
             driver.get(url)
             # textarea =  driver.find_element_by_id('code-text')
@@ -80,6 +82,13 @@ def add_code(driver, stu_submit):
             driver.switch_to.active_element.send_keys(Keys.CONTROL, 'c')
             code = get_text()
             dic['submit_code'] = code
+
+
+def pack_sub(stu_submit):
+    for user_id in stu_submit.keys():
+        latest = generate_html.find_latest_submit(stu_submit[user_id])
+        stu_submit[user_id] = latest
+    return stu_submit
 
 
 def get_text():  # 读取剪切板
